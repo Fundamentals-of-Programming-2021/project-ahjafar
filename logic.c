@@ -1,6 +1,6 @@
 #include "graphic.h"
 
-#define N_BOTS 3
+
 
 void player_setup(char name[10],char n_bots){
     player_list[0].id=0;
@@ -21,6 +21,7 @@ void player_setup(char name[10],char n_bots){
 int main(int argc, char* argv[]){
     player_setup("AmirHasan",N_BOTS);
     init();
+    random_map(N_TERRITORIES);
     draw_map();
     kill();
     return 0;
