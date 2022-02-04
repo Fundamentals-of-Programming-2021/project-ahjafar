@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include "graphic.h"
 
 SDL_Window* init(){
@@ -9,28 +5,25 @@ SDL_Window* init(){
 
     // Create a SDL window
     SDL_Window* window = SDL_CreateWindow("State.io",
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED,
+                                          SDL_WINDOWPOS_CENTERED,
+                                          SDL_WINDOWPOS_CENTERED,
                                           WIDTH,
                                           HEIGHT,
                                           SDL_WINDOW_OPENGL);
 }
 
-
 void draw_map(SDL_Window* window){
     SDL_Renderer *renderer = SDL_CreateRenderer(window,
                                                 -1,
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    //SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
     // Initialize support for loading PNG and JPEG images
     IMG_Init(IMG_INIT_PNG);
 
-    SDL_Texture * image_texture = initialize_texture_from_file("territories\\1-0.png", renderer);
+    SDL_Texture * image_texture = initialize_texture_from_file("territories\\1-5.png", renderer);
 
     // Define where on the "screen" we want to draw the texture
     SDL_Rect texture_destination;
-
     texture_destination.x = 100;
     texture_destination.y = 50;
     texture_destination.w = IMAGE_SIZE;
@@ -49,14 +42,17 @@ void draw_map(SDL_Window* window){
             }
         }
 
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         // Clear screen
         SDL_RenderClear(renderer);
-
         // Draw
         SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
 
+        filledCircleColor(renderer, 150, 100, 10,  0xff70295d);
+
         // Show what was drawn
         SDL_RenderPresent(renderer);
+        SDL_Delay(1000 / FPS);
     }
 
     SDL_DestroyTexture(image_texture);
