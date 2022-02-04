@@ -32,7 +32,7 @@ void random_map(int n_territories){
         territory_list[i].y=y;
         territory_list[i].going=0;
         territory_list[i].player_id=0;
-        territory_list[i].residents=20;
+        territory_list[i].residents=STARTERS;
         territory_list[i].id=i+1;
     }
     int p;
@@ -61,15 +61,34 @@ void draw_territory(struct territory state){
     texture_destination.w = IMAGE_SIZE;
     texture_destination.h = IMAGE_SIZE;
 
-    int w,h;
-    TTF_SizeText(font, "50", &w, &h);
-
-    textbox.x = state.x+43;
+    
+    char residents[5];
+    itoa(state.going+state.residents,residents,10);
+    int w,h=14,offset;
+    switch(strlen(residents)){
+        case 1:
+            w=6;
+            offset=6;
+            break;
+        case 2:
+            w=12;
+            offset=2;
+            break;
+        case 3:
+            w=18;
+            offset=-1;
+            break;
+        case 4:
+            w=24;
+            offset=-4;
+            break;
+    }
+    textbox.x = state.x+43+offset;
     textbox.y = state.y+43;
     textbox.w = w;
     textbox.h = h;
     SDL_Color color= {255,255,255,255};
-    textsurface = TTF_RenderText_Solid(font, "50",color);
+    textsurface = TTF_RenderText_Solid(font, residents,color);
     ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
 
     SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);

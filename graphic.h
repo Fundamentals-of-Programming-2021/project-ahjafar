@@ -26,6 +26,8 @@
 #define N_BOTS 3
 #define N_TERRITORIES 10
 
+#define STARTERS 25
+
 static SDL_Window* window;
 static SDL_Renderer* renderer;
 static SDL_Texture *texture, *text;
