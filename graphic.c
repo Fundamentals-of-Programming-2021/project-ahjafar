@@ -1,24 +1,26 @@
 #include "graphic.h"
 
-SDL_Window* init(){
+void init(){
     SDL_Init(SDL_INIT_VIDEO);
 
     // Create a SDL window
-    SDL_Window* window = SDL_CreateWindow("State.io",
-                                          SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED,
-                                          WIDTH,
-                                          HEIGHT,
-                                          SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("State.io",
+                               SDL_WINDOWPOS_CENTERED,
+                               SDL_WINDOWPOS_CENTERED,
+                               WIDTH,
+                               HEIGHT,
+                               SDL_WINDOW_OPENGL);
 }
 
-void draw_map(SDL_Window* window){
-    SDL_Renderer *renderer = SDL_CreateRenderer(window,
-                                                -1,
-                                                SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+void draw_map(){
+    renderer = SDL_CreateRenderer(window,
+                                  -1,
+                                  SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    // Initialize support for loading PNG and JPEG images
     IMG_Init(IMG_INIT_PNG);
+
+    TTF_Init();
+    font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
 
     SDL_Texture * image_texture = initialize_texture_from_file("territories\\1-5.png", renderer);
 
@@ -28,6 +30,18 @@ void draw_map(SDL_Window* window){
     texture_destination.y = 50;
     texture_destination.w = IMAGE_SIZE;
     texture_destination.h = IMAGE_SIZE;
+
+    int w,h;
+    TTF_SizeText(font, "5", &w, &h);
+    printf("%d %d",w,h);
+    SDL_Rect textbox;
+    textbox.x = 141;
+    textbox.y = 93;
+    textbox.w = w;
+    textbox.h = h;
+    SDL_Color color= {255,255,255,255};
+    SDL_Surface* textsurface = TTF_RenderText_Solid(font, "5",color);
+    SDL_Texture* ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
 
     int running = 1;
     SDL_Event event;
@@ -42,13 +56,15 @@ void draw_map(SDL_Window* window){
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         // Clear screen
         SDL_RenderClear(renderer);
         // Draw
         SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
 
         filledCircleColor(renderer, 150, 100, 10,  0xff70295d);
+
+        SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
 
         // Show what was drawn
         SDL_RenderPresent(renderer);
@@ -69,4 +85,20 @@ SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *r
     SDL_Texture * image_texture = SDL_CreateTextureFromSurface(renderer, image);
     SDL_FreeSurface(image);
     return image_texture;
+}
+
+void kill() {
+    
+	TTF_CloseFont( font );
+	SDL_DestroyTexture( texture );
+	texture = NULL;
+
+	SDL_DestroyRenderer( renderer );
+	SDL_DestroyWindow( window );
+	window = NULL;
+	renderer = NULL;
+
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
 }
