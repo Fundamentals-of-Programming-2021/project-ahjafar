@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -35,12 +37,18 @@ struct player{
     int score;
 };
 
-static struct player* player_list;
+static struct player player_list[6];
 
 struct territory{
     char id;
     struct player* Player;
+    int residents;
+    int going;
+    int x;
+    int y;
 };
+
+static struct territory territory_list[10];
 
 void init();
 

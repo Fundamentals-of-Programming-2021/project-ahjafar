@@ -12,6 +12,31 @@ void init(){
                                SDL_WINDOW_OPENGL);
 }
 
+void random_map(n_territories){
+    int x,y;
+    srand(time(0));
+    for(int i=0;i<n_territories;i++){
+        char found=0;
+        while(!found){
+            x=rand()%(WIDTH-IMAGE_SIZE);
+            y=rand()%(HEIGHT-IMAGE_SIZE);
+            found=1;
+            for(int j=0;j<i;j++){
+                if(abs(territory_list[j].x-x)<100 && abs(territory_list[j].y-y)<100){
+                    found=0;
+                    break;
+                }
+            }
+        }
+        territory_list[i].x=x;
+        territory_list[i].y=y;
+    }
+}
+
+void draw_territory(struct territory state){
+    blah blah blah
+}
+
 void draw_map(){
     renderer = SDL_CreateRenderer(window,
                                   -1,
