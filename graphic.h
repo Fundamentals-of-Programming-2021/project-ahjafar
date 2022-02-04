@@ -23,7 +23,7 @@
 
 #define FPS 30
 
-#define N_BOTS 3
+#define N_BOTS 4
 #define N_TERRITORIES 10
 
 #define STARTERS 25
@@ -34,7 +34,8 @@ static SDL_Texture *texture, *text;
 static TTF_Font* font; 
 
 static const Uint32 colors[6]={0xff1c1a17,0xff0000ff,0xff00ff00,0xffff0000,0xff00ffff,0xff70295d};
-static const Uint32 text_colors[6]={0xffffffff,0xffffffff,0xffffffff,0xffffffff,0xffffffff,0xffffffff};
+static const SDL_Color text_colors[6]={{255,255,255,255},{255,255,255,255},{0,0,0,255},
+                                       {255,255,255,255},{0,0,0,255},{255,255,255,255}};
 
 static SDL_Texture * image_texture;
 static SDL_Rect texture_destination;

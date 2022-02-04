@@ -87,12 +87,11 @@ void draw_territory(struct territory state){
     textbox.y = state.y+43;
     textbox.w = w;
     textbox.h = h;
-    SDL_Color color= {255,255,255,255};
-    textsurface = TTF_RenderText_Solid(font, residents,color);
+    textsurface = TTF_RenderText_Solid(font, residents,text_colors[state.player_id]);
     ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
 
     SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
-    filledCircleColor(renderer, state.x+50, state.y+50, 10,  0xff70295d);
+    filledCircleColor(renderer, state.x+50, state.y+50, 10,  colors[state.player_id]);
     SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
     
     SDL_DestroyTexture(image_texture);
