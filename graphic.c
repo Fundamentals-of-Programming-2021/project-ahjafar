@@ -34,7 +34,7 @@ void random_map(n_territories){
 }
 
 void draw_territory(struct territory state){
-    blah blah blah
+
 }
 
 void draw_map(){
