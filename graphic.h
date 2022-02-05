@@ -17,9 +17,8 @@
 #define HEIGHT 400
 
 #define IMAGE_SIZE 100
-
-#define NUMBER_WIDTH 18
-#define NUMBER_HEIGHT 14
+#define MENU_WIDTH 300
+#define MENU_HEIGHT 350
 
 #define FPS 30
 
@@ -27,6 +26,8 @@
 #define N_TERRITORIES 10
 
 #define STARTERS 25
+#define RATE 0.1
+#define NAME_LENGTH 40
 
 static SDL_Window* window;
 static SDL_Renderer* renderer;
@@ -44,7 +45,7 @@ static SDL_Surface* textsurface;
 static SDL_Texture* ttfTexture;
 
 struct player{
-    char name[25];
+    char name[NAME_LENGTH];
     char id;
     int score;
 };
@@ -54,22 +55,28 @@ static struct player player_list[6];
 struct territory{
     char id;
     int player_id;
-    int residents;
+    float residents;
     int going;
     int x;
     int y;
+};
+struct InputWidget{
+	int x;
+	int y;
+	int maxLength;
+	char *text;
 };
 
 static struct territory territory_list[10];
 
 void init();
 
-void draw_map();
+void draw_map(struct territory territory_list[10]);
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 
-void random_map(int n_territories);
-
 void kill();
+
+void menu();
 
 #endif

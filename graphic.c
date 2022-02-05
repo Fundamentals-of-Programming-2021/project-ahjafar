@@ -10,42 +10,81 @@ void init(){
                                WIDTH,
                                HEIGHT,
                                SDL_WINDOW_OPENGL);
+    
+    renderer = SDL_CreateRenderer(window,
+                                  -1,
+                                  SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    IMG_Init(IMG_INIT_PNG);
+
+    TTF_Init();
+    font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
 }
 
-void random_map(int n_territories){
-    int x,y;
-    srand(time(0));
-    for(int i=0;i<n_territories;i++){
-        char found=0;
-        while(!found){
-            x=rand()%(WIDTH-IMAGE_SIZE);
-            y=rand()%(HEIGHT-IMAGE_SIZE);
-            found=1;
-            for(int j=0;j<i;j++){
-                if(abs(territory_list[j].x-x)<100 && abs(territory_list[j].y-y)<100){
-                    found=0;
-                    break;
+void menu(){
+    image_texture= initialize_texture_from_file("menu.png", renderer);
+
+    char username[NAME_LENGTH]={0};
+    SDL_StartTextInput();
+
+    SDL_Rect textbox = {175, 50, 72, 14},inputbox = {175, 70, 72, 14};
+
+    char running = 1;
+    SDL_Event event;
+    while(running){        
+        while(SDL_PollEvent(&event)){
+            if(event.type == SDL_QUIT){
+                running = 0;
+            }else if(event.type == SDL_KEYDOWN){
+                //Handle backspace
+                if(event.key.keysym.sym == SDLK_BACKSPACE && strlen(username) > 0){
+                    //lop off character
+                    username[strlen(username)-1]='\0';
+                }else if(event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL){
+                    SDL_SetClipboardText(username);
+                }else if(event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL){
+                    strcpy(username , SDL_GetClipboardText());
+            }}else if(event.type == SDL_TEXTINPUT){
+                //Not copy or pasting
+                if( !( SDL_GetModState() & KMOD_CTRL && (event.text.text[0] == 'c' || event.text.text[0] == 'C' || event.text.text[0] == 'v' || event.text.text[0] == 'V' ))){                     //Append character
+                    strcpy(username,strcat(username,event.text.text));
                 }
             }
         }
-        territory_list[i].x=x;
-        territory_list[i].y=y;
-        territory_list[i].going=0;
-        territory_list[i].player_id=0;
-        territory_list[i].residents=STARTERS;
-        territory_list[i].id=i+1;
-    }
-    int p;
-    for(int i=1;i<N_BOTS+2;i++){
-        char found=0;
-        while(!found){
-            p=rand()%(N_TERRITORIES);
-            found=1;
-            if(territory_list[p].player_id!=0){
-                found=0;
-            }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        SDL_Color text_color = {0, 0, 0, 255};
+        textsurface = TTF_RenderText_Solid(font,"Player Name:",text_color);
+        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+
+        texture_destination.x = 150;
+        texture_destination.y = 25;
+        texture_destination.w = MENU_WIDTH;
+        texture_destination.h = MENU_HEIGHT;
+
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+
+        SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
+        SDL_DestroyTexture(ttfTexture);
+        SDL_FreeSurface(textsurface);
+
+        boxColor(renderer, 170, 65, 430, 85, 0xffffffff);
+
+        if(strlen(username)!=0){
+            TTF_SizeText(font, username, &inputbox.w, &inputbox.h);
+            textsurface = TTF_RenderText_Solid(font,username,text_color);
+        }else{
+            TTF_SizeText(font, " ", &inputbox.w, &inputbox.h);
+            textsurface = TTF_RenderText_Solid(font," ",text_color); 
         }
-        territory_list[p].player_id=i;
+        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+        SDL_RenderCopy(renderer, ttfTexture, NULL, &inputbox);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(1000 / FPS);
+        SDL_DestroyTexture(ttfTexture);
+        SDL_FreeSurface(textsurface);
     }
 }
 
@@ -61,7 +100,6 @@ void draw_territory(struct territory state){
     texture_destination.w = IMAGE_SIZE;
     texture_destination.h = IMAGE_SIZE;
 
-    
     char residents[5];
     itoa(state.going+state.residents,residents,10);
     int w,h=14,offset;
@@ -83,6 +121,7 @@ void draw_territory(struct territory state){
             offset=-4;
             break;
     }
+    
     textbox.x = state.x+43+offset;
     textbox.y = state.y+43;
     textbox.w = w;
@@ -99,17 +138,8 @@ void draw_territory(struct territory state){
     SDL_FreeSurface(textsurface);
 }
 
-void draw_map(){
-    renderer = SDL_CreateRenderer(window,
-                                  -1,
-                                  SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-    IMG_Init(IMG_INIT_PNG);
-
-    TTF_Init();
-    font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
-
-    int running = 1;
+void draw_map(struct territory territory_list[10]){
+    char running = 1;
     SDL_Event event;
     while(running)
     {
@@ -125,6 +155,11 @@ void draw_map(){
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         // Clear screen
         SDL_RenderClear(renderer);
+
+        for(int i=0;i<N_TERRITORIES;i++){
+            if(territory_list[i].residents<50)
+                territory_list[i].residents+=RATE;
+        }
 
         for(int i=0;i<N_TERRITORIES;i++){
             draw_territory(territory_list[i]);
