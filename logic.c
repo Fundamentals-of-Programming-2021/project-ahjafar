@@ -58,9 +58,11 @@ void random_map(int n_territories){
 int main(int argc, char* argv[]){
     player_setup("AmirHasan",N_BOTS);
     init();
-    menu();
-    random_map(N_TERRITORIES);
-    draw_map(territory_list);
+    int menu_res=menu();
+    if(menu_res==3){
+        random_map(N_TERRITORIES);
+        draw_map(territory_list);
+    }
     kill();
     return 0;
 }

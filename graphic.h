@@ -67,6 +67,7 @@ struct InputWidget{
 	char *text;
 };
 
+
 static struct territory territory_list[10];
 
 void init();
@@ -77,6 +78,6 @@ SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *r
 
 void kill();
 
-void menu();
+int menu();
 
 #endif

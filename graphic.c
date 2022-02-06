@@ -21,13 +21,15 @@ void init(){
     font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
 }
 
-void menu(){
+int menu(){
+    int return_val=0;
     image_texture= initialize_texture_from_file("menu.png", renderer);
 
     char username[NAME_LENGTH]={0};
     SDL_StartTextInput();
 
-    SDL_Rect textbox = {175, 50, 72, 14},inputbox = {175, 70, 72, 14};
+    SDL_Rect textbox = {175, 50, 72, 14},inputbox = {175, 90, 72, 14},start_button={287,318,27,14},
+                        continue_button={248,243,103,14},scoreboard_button={270,168,59,14};
 
     char running = 1;
     SDL_Event event;
@@ -44,13 +46,31 @@ void menu(){
                     SDL_SetClipboardText(username);
                 }else if(event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL){
                     strcpy(username , SDL_GetClipboardText());
-            }}else if(event.type == SDL_TEXTINPUT){
+                }
+            }else if(event.type == SDL_TEXTINPUT){
                 //Not copy or pasting
-                if( !( SDL_GetModState() & KMOD_CTRL && (event.text.text[0] == 'c' || event.text.text[0] == 'C' || event.text.text[0] == 'v' || event.text.text[0] == 'V' ))){                     //Append character
+                if(!( SDL_GetModState() & KMOD_CTRL && (event.text.text[0] == 'c' || event.text.text[0] == 'C' || event.text.text[0] == 'v' || event.text.text[0] == 'V' ))){                     //Append character
                     strcpy(username,strcat(username,event.text.text));
+                }
+            }else if(event.type==SDL_MOUSEBUTTONDOWN){
+                if(event.button.x>250 && event.button.x<350 && event.button.button==SDL_BUTTON_LEFT){
+                    if(event.button.y>150 && event.button.y<200){
+                        //scorboard
+                        return_val=1;
+                        running=0;
+                    }else if(event.button.y>225 && event.button.y<275){
+                        //play saved game
+                        return_val=2;
+                        running=0;
+                    }else if(event.button.y>300 && event.button.y<350){
+                        //start a new one
+                        return_val=3;
+                        running=0;
+                    }
                 }
             }
         }
+        
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
         SDL_Color text_color = {0, 0, 0, 255};
@@ -69,8 +89,12 @@ void menu(){
         SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
         SDL_DestroyTexture(ttfTexture);
         SDL_FreeSurface(textsurface);
-
-        boxColor(renderer, 170, 65, 430, 85, 0xffffffff);
+        //textbox
+        boxColor(renderer, 170, 85, 430, 105, 0xffffffff);
+        //buttons
+        boxColor(renderer, 235, 150, 365, 200, 0x44ff0000);
+        boxColor(renderer, 235, 225, 365, 275, 0x44ff0000);
+        boxColor(renderer, 235, 300, 365, 350, 0x44ff0000);
 
         if(strlen(username)!=0){
             TTF_SizeText(font, username, &inputbox.w, &inputbox.h);
@@ -81,11 +105,28 @@ void menu(){
         }
         ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
         SDL_RenderCopy(renderer, ttfTexture, NULL, &inputbox);
+
+        textsurface = TTF_RenderText_Solid(font,"Start",text_color);
+        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+        SDL_RenderCopy(renderer, ttfTexture, NULL, &start_button);
+
+        textsurface = TTF_RenderText_Solid(font,"Continue Last Save",text_color);
+        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+        SDL_RenderCopy(renderer, ttfTexture, NULL, &continue_button);
+
+        textsurface = TTF_RenderText_Solid(font,"Scoreboard",text_color);
+        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+        SDL_RenderCopy(renderer, ttfTexture, NULL, &scoreboard_button);
+
         SDL_RenderPresent(renderer);
         SDL_Delay(1000 / FPS);
         SDL_DestroyTexture(ttfTexture);
         SDL_FreeSurface(textsurface);
     }
+    int w,h;
+    TTF_SizeText(font, "Scoreboard",&w, &h);
+    printf("%d %d",w,h);
+    return return_val;
 }
 
 void draw_territory(struct territory state){
