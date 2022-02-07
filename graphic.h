@@ -40,8 +40,8 @@ static const SDL_Color text_colors[6]={{255,255,255,255},{255,255,255,255},{0,0,
 
 static SDL_Texture * image_texture;
 static SDL_Rect texture_destination;
-static SDL_Rect textbox;
-static SDL_Surface* textsurface;
+//SDL_Rect textbox;
+static SDL_Surface* textsurface=NULL;
 static SDL_Texture* ttfTexture;
 
 struct player{

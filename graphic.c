@@ -21,6 +21,19 @@ void init(){
     font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
 }
 
+void show_text(char* text,int x,int y,SDL_Color text_color){
+    SDL_Rect textbox = {x, y, 20, 20};
+    TTF_SizeText(font, text,&textbox.w, &textbox.h);
+    if(textsurface!=NULL){
+
+    }
+    textsurface = TTF_RenderText_Solid(font,text,text_color);
+    ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+    SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
+            SDL_DestroyTexture(ttfTexture);
+        SDL_FreeSurface(textsurface);
+}
+
 int menu(){
     int return_val=0;
     image_texture= initialize_texture_from_file("menu.png", renderer);
@@ -46,6 +59,9 @@ int menu(){
                     SDL_SetClipboardText(username);
                 }else if(event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL){
                     strcpy(username , SDL_GetClipboardText());
+                }else if(event.key.keysym.sym == SDLK_RETURN){
+                    return_val=3;
+                    running=0;
                 }
             }else if(event.type == SDL_TEXTINPUT){
                 //Not copy or pasting
@@ -74,8 +90,7 @@ int menu(){
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
         SDL_Color text_color = {0, 0, 0, 255};
-        textsurface = TTF_RenderText_Solid(font,"Player Name:",text_color);
-        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+
 
         texture_destination.x = 150;
         texture_destination.y = 25;
@@ -84,11 +99,11 @@ int menu(){
 
         SDL_RenderClear(renderer);
 
+
         SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
 
-        SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
-        SDL_DestroyTexture(ttfTexture);
-        SDL_FreeSurface(textsurface);
+        show_text("Player Name:",175, 50,text_color);
+
         //textbox
         boxColor(renderer, 170, 85, 430, 105, 0xffffffff);
         //buttons
@@ -97,35 +112,22 @@ int menu(){
         boxColor(renderer, 235, 300, 365, 350, 0x44ff0000);
 
         if(strlen(username)!=0){
-            TTF_SizeText(font, username, &inputbox.w, &inputbox.h);
-            textsurface = TTF_RenderText_Solid(font,username,text_color);
+            show_text(username,175,90,text_color);
         }else{
-            TTF_SizeText(font, " ", &inputbox.w, &inputbox.h);
-            textsurface = TTF_RenderText_Solid(font," ",text_color); 
+            show_text(" ",175,90,text_color);
         }
-        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
-        SDL_RenderCopy(renderer, ttfTexture, NULL, &inputbox);
 
-        textsurface = TTF_RenderText_Solid(font,"Start",text_color);
-        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
-        SDL_RenderCopy(renderer, ttfTexture, NULL, &start_button);
+        show_text("Scoreboard",270,168,text_color);
 
-        textsurface = TTF_RenderText_Solid(font,"Continue Last Save",text_color);
-        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
-        SDL_RenderCopy(renderer, ttfTexture, NULL, &continue_button);
+        show_text("Continue Last Save",248,243,text_color);
 
-        textsurface = TTF_RenderText_Solid(font,"Scoreboard",text_color);
-        ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
-        SDL_RenderCopy(renderer, ttfTexture, NULL, &scoreboard_button);
+        show_text("Start",287, 318,text_color);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(1000 / FPS);
-        SDL_DestroyTexture(ttfTexture);
-        SDL_FreeSurface(textsurface);
+
     }
-    int w,h;
-    TTF_SizeText(font, "Scoreboard",&w, &h);
-    printf("%d %d",w,h);
+    SDL_DestroyTexture(image_texture);
     return return_val;
 }
 
@@ -143,40 +145,28 @@ void draw_territory(struct territory state){
 
     char residents[5];
     itoa(state.going+state.residents,residents,10);
-    int w,h=14,offset;
+    int offset;
     switch(strlen(residents)){
         case 1:
-            w=6;
             offset=6;
             break;
         case 2:
-            w=12;
             offset=2;
             break;
         case 3:
-            w=18;
             offset=-1;
             break;
         case 4:
-            w=24;
             offset=-4;
             break;
     }
     
-    textbox.x = state.x+43+offset;
-    textbox.y = state.y+43;
-    textbox.w = w;
-    textbox.h = h;
-    textsurface = TTF_RenderText_Solid(font, residents,text_colors[state.player_id]);
-    ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
-
     SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
     filledCircleColor(renderer, state.x+50, state.y+50, 10,  colors[state.player_id]);
-    SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
-    
+    show_text(residents,state.x+43+offset,state.y+43,text_colors[state.player_id]);
+
     SDL_DestroyTexture(image_texture);
-    SDL_DestroyTexture(ttfTexture);
-    SDL_FreeSurface(textsurface);
+
 }
 
 void draw_map(struct territory territory_list[10]){
