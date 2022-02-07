@@ -1,6 +1,17 @@
 #include "graphic.h"
 
-
+void game_ended(char* game_state){
+    int player_in_game=0,bots_in_game=0;
+    for(int i=0;i<10;i++){
+        if(territory_list[i].player_id==1)player_in_game=1;
+        else if(territory_list[i].player_id>1)bots_in_game=1;
+    }
+    if(player_in_game==0){
+        *game_state=2;
+    }else if(bots_in_game==0){
+        *game_state=3;
+    }
+}
 
 void player_setup(char name[10],char n_bots){
     player_list[0].id=0;
@@ -56,14 +67,57 @@ void random_map(int n_territories){
     }
 }
 
+int find_clicked(int x,int y){
+    int found=-1;
+    for(int i=0;i<10;i++){
+        if(x>territory_list[i].x+40 && x<territory_list[i].x+60 &&
+           y>territory_list[i].y+40 && y<territory_list[i].y+60){
+               found=territory_list[i].id;
+               break;
+           }
+    }
+    return found;
+}
+
+struct territory* move(int start,int end,char* running){
+    if(territory_list[start].player_id!=1)return territory_list;
+    if(territory_list[start].player_id==territory_list[end].player_id){
+        territory_list[end].residents+=territory_list[start].residents;
+        territory_list[start].residents=0;
+    }else{
+        if(territory_list[end].residents-territory_list[start].residents>0){
+            territory_list[end].residents-=territory_list[start].residents;
+            territory_list[start].residents=0;
+            game_ended(running);
+        }else{
+            territory_list[end].residents=territory_list[start].residents-territory_list[end].residents;
+            territory_list[end].player_id=territory_list[start].player_id;
+            territory_list[start].residents=0;
+            game_ended(running);
+        }
+    }
+    return territory_list;
+}
+
 int main(int argc, char* argv[]){
     player_setup("AmirHasan",N_BOTS);
     init();
-    int menu_res=menu();
+    int menu_res=menu(),game_res=0;
     if(menu_res==3){
         random_map(N_TERRITORIES);
-        draw_map(territory_list);
+        game_res=draw_map(territory_list);
     }
-    kill();
-    return 0;
+    if(game_res==0){
+        kill();
+        return 0;
+    }else if(game_res==2){
+        kill();
+        printf("You Lost.\n");
+        main(0,NULL);
+    }else if(game_res==3){
+        kill();
+        printf("You Won.\n");
+        main(0,NULL);
+    }
+
 }

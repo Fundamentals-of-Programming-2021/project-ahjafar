@@ -61,24 +61,27 @@ struct territory{
     int x;
     int y;
 };
-struct InputWidget{
-	int x;
-	int y;
-	int maxLength;
-	char *text;
-};
 
+
+static int start_point=-1;
+static int end_point=-1;
 
 static struct territory territory_list[10];
 
 void init();
 
-void draw_map(struct territory territory_list[10]);
+int draw_map(struct territory territory_list[10]);
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 
 void kill();
 
 int menu();
+
+
+//logic.c funcs#######################
+int find_clicked(int x,int y);
+
+struct territory* move(int start,int end,char* game_state);
 
 #endif

@@ -168,20 +168,29 @@ void draw_territory(struct territory state){
     SDL_DestroyTexture(image_texture);
 }
 
-void draw_map(struct territory territory_list[10]){
-    char running = 1;
+int draw_map(struct territory territory_list[10]){
+    char game_state = 1;
     SDL_Event event;
-    while(running)
+    while(game_state==1)
     {
         // Process events
         while(SDL_PollEvent(&event))
         {
             if(event.type == SDL_QUIT)
             {
-                running = 0;
-            }else if(event.type == SDL_DROPBEGIN)
-            {
-                printf("Hiiiii");
+                game_state = 0;
+            }else if(event.type==SDL_MOUSEBUTTONDOWN){
+                if(event.button.button==SDL_BUTTON_LEFT){
+                    start_point=find_clicked(event.button.x,event.button.y);
+                }
+            }else if(event.type==SDL_MOUSEBUTTONUP){
+                if(event.button.button==SDL_BUTTON_LEFT){
+                    end_point=find_clicked(event.button.x,event.button.y);
+                    //printf("moved from %d to %d\n",start_point,end_point);
+                    if(start_point!=-1 && end_point!=-1 && start_point!=end_point){
+                        territory_list=move(start_point-1,end_point-1,&game_state);
+                    }
+                }
             }
         }
 
@@ -202,7 +211,7 @@ void draw_map(struct territory territory_list[10]){
         SDL_RenderPresent(renderer);
         SDL_Delay(1000 / FPS);
     }
-  
+  return game_state;
 }
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer* renderer) {
