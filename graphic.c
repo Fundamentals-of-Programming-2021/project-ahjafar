@@ -166,7 +166,6 @@ void draw_territory(struct territory state){
     show_text(residents,state.x+43+offset,state.y+43,text_colors[state.player_id]);
 
     SDL_DestroyTexture(image_texture);
-
 }
 
 void draw_map(struct territory territory_list[10]){
@@ -180,6 +179,9 @@ void draw_map(struct territory territory_list[10]){
             if(event.type == SDL_QUIT)
             {
                 running = 0;
+            }else if(event.type == SDL_DROPBEGIN)
+            {
+                printf("Hiiiii");
             }
         }
 
@@ -188,7 +190,7 @@ void draw_map(struct territory territory_list[10]){
         SDL_RenderClear(renderer);
 
         for(int i=0;i<N_TERRITORIES;i++){
-            if(territory_list[i].residents<50)
+            if(territory_list[i].residents<50 && territory_list[i].player_id!=0)
                 territory_list[i].residents+=RATE;
         }
 

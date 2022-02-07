@@ -38,7 +38,7 @@ void random_map(int n_territories){
         territory_list[i].y=y;
         territory_list[i].going=0;
         territory_list[i].player_id=0;
-        territory_list[i].residents=STARTERS;
+        territory_list[i].residents=NEUTRAL_STARTERS;
         territory_list[i].id=i+1;
     }
     int p;
@@ -52,6 +52,7 @@ void random_map(int n_territories){
             }
         }
         territory_list[p].player_id=i;
+        territory_list[p].residents=STARTERS;
     }
 }
 

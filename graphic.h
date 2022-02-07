@@ -26,6 +26,7 @@
 #define N_TERRITORIES 10
 
 #define STARTERS 25
+#define NEUTRAL_STARTERS 40 
 #define RATE 0.1
 #define NAME_LENGTH 40
 
