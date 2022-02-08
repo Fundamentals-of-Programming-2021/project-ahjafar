@@ -1,4 +1,5 @@
 #include "graphic.h"
+#include "logic.h"
 
 void init(){
     SDL_Init(SDL_INIT_VIDEO);
@@ -27,7 +28,7 @@ void show_text(char* text,int x,int y,SDL_Color text_color){
     if(textsurface!=NULL){
 
     }
-    textsurface = TTF_RenderText_Solid(font,text,text_color);
+    textsurface = TTF_RenderText_Blended(font,text,text_color);
     ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
     SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
             SDL_DestroyTexture(ttfTexture);
@@ -170,6 +171,8 @@ void draw_territory(struct territory state){
 
 int draw_map(struct territory territory_list[10]){
     char game_state = 1;
+    int start_point=-1;
+    int end_point=-1;
     SDL_Event event;
     while(game_state==1)
     {

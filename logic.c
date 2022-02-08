@@ -1,4 +1,5 @@
 #include "graphic.h"
+#include "logic.h"
 
 void game_ended(char* game_state){
     int player_in_game=0,bots_in_game=0;
@@ -85,7 +86,7 @@ struct territory* move(int start,int end,char* running){
         territory_list[end].residents+=territory_list[start].residents;
         territory_list[start].residents=0;
     }else{
-        if(territory_list[end].residents-territory_list[start].residents>0){
+        if(territory_list[end].residents-territory_list[start].residents>=1){
             territory_list[end].residents-=territory_list[start].residents;
             territory_list[start].residents=0;
             game_ended(running);
