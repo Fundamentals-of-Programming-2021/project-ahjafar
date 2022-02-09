@@ -22,6 +22,8 @@
 #define MENU_WIDTH 300
 #define MENU_HEIGHT 350
 
+#define SPEED 2.5
+
 #define FPS 30
 
 static SDL_Window* window;
@@ -35,7 +37,18 @@ static SDL_Rect texture_destination;
 static SDL_Surface* textsurface=NULL;
 static SDL_Texture* ttfTexture;
 
+struct moving{
+    float x;
+    float y;
+    int all;
+    struct territory* start;
+    struct territory* end;
+    float v_x,v_y;
+    int player_id;
+    struct moving* next;
+};
 
+static struct moving* head=NULL;
 
 void init();
 
@@ -46,6 +59,10 @@ SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *r
 void kill();
 
 int menu();
+
+void add_to_moving(struct territory* start,struct territory* end,int n);
+
+void move_soldiers();
 
 
 #endif

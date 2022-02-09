@@ -1,6 +1,71 @@
 #include "graphic.h"
 #include "logic.h"
 
+void move_soldiers(){
+    struct moving* iterator=head,*last=NULL;
+    while(iterator!=NULL){
+        filledCircleColor(renderer, iterator->x+50, iterator->y+50, 3,  colors[iterator->player_id]);
+        iterator->x+=iterator->v_x;
+        iterator->y+=iterator->v_y;
+        if(abs(iterator->end->x-iterator->x)<10 && abs(iterator->end->y-iterator->y)<10){
+            if(iterator->player_id==iterator->end->player_id){
+                iterator->end->residents+=iterator->all;
+            }else{
+                if(iterator->end->residents>iterator->all){
+                    iterator->end->residents-=iterator->all;
+                }else if(iterator->end->residents+iterator->end->going>iterator->all){
+                    iterator->all-=iterator->end->residents;
+                    iterator->end->going-=iterator->all;
+                }else{
+                    iterator->end->player_id=iterator->player_id;
+                    iterator->end->residents=iterator->all-(iterator->end->residents+iterator->end->going);
+                }
+            }
+            if(iterator!=head){
+                struct moving* next=iterator->next;
+                free(iterator);
+                last->next=next;
+                iterator=last;
+            }else{
+                struct moving* next=iterator->next;
+                free(head);
+                head=next;
+                iterator=head;
+                continue;
+            }
+        }
+        last=iterator;
+        iterator=iterator->next;
+    }
+
+}
+
+void add_to_moving(struct territory* start,struct territory* end,int n){
+    struct moving* moving_ptr=malloc(sizeof(struct moving));
+    moving_ptr=malloc(sizeof(struct moving));
+    moving_ptr->all=n;
+    float distance=sqrt(pow(start->x-end->x,2)+pow(start->y-end->y,2));
+    moving_ptr->v_x=(end->x-start->x)/distance*SPEED;
+    moving_ptr->v_y=(end->y-start->y)/distance*SPEED;
+    moving_ptr->next=NULL;
+    moving_ptr->x=start->x;
+    moving_ptr->y=start->y;
+    moving_ptr->player_id=start->player_id;
+    moving_ptr->start=start;
+    moving_ptr->end=end;
+    if(head==NULL){
+        head=moving_ptr;
+    }
+    else{
+        struct moving* iterator=head;
+        while(iterator->next!=NULL){
+            iterator=iterator->next;
+        }
+        iterator->next=moving_ptr;
+    }
+
+}
+
 void init(){
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -174,6 +239,7 @@ int draw_map(struct territory territory_list[10]){
     int start_point=-1;
     int end_point=-1;
     SDL_Event event;
+    int t=SDL_GetTicks();
     while(game_state==1)
     {
         // Process events
@@ -191,7 +257,9 @@ int draw_map(struct territory territory_list[10]){
                     end_point=find_clicked(event.button.x,event.button.y);
                     //printf("moved from %d to %d\n",start_point,end_point);
                     if(start_point!=-1 && end_point!=-1 && start_point!=end_point){
-                        territory_list=move(start_point-1,end_point-1,&game_state);
+                        territory_list[start_point-1].going_list[end_point-1]=territory_list[start_point-1].residents;
+                        territory_list[start_point-1].going+=territory_list[start_point-1].residents;
+                        territory_list[start_point-1].residents=0;
                     }
                 }
             }
@@ -209,6 +277,15 @@ int draw_map(struct territory territory_list[10]){
         for(int i=0;i<N_TERRITORIES;i++){
             draw_territory(territory_list[i]);
         }
+
+        if(SDL_GetTicks()-t>200){
+            territory_list=move();
+            t=SDL_GetTicks();
+        }
+
+        move_soldiers();
+
+        game_ended(&game_state);
 
         // Show what was drawn
         SDL_RenderPresent(renderer);

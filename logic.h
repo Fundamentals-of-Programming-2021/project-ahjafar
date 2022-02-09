@@ -26,12 +26,13 @@ struct territory{
     int player_id;
     float residents;
     int going;
+    int going_list[10];
     int x;
     int y;
 };
 
-static struct territory territory_list[10];
 
+static struct territory territory_list[10];
 
 void game_ended(char* game_state);
 
@@ -41,6 +42,6 @@ void random_map(int n_territories);
 
 int find_clicked(int x,int y);
 
-struct territory* move(int start,int end,char* running);
+struct territory* move();
 
 #endif

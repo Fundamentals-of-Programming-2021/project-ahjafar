@@ -1,6 +1,10 @@
 #include "graphic.h"
 #include "logic.h"
 
+struct territory* AI(){
+
+}
+
 void game_ended(char* game_state){
     int player_in_game=0,bots_in_game=0;
     for(int i=0;i<10;i++){
@@ -80,21 +84,18 @@ int find_clicked(int x,int y){
     return found;
 }
 
-struct territory* move(int start,int end,char* running){
-    if(territory_list[start].player_id!=1)return territory_list;
-    if(territory_list[start].player_id==territory_list[end].player_id){
-        territory_list[end].residents+=territory_list[start].residents;
-        territory_list[start].residents=0;
-    }else{
-        if(territory_list[end].residents-territory_list[start].residents>=1){
-            territory_list[end].residents-=territory_list[start].residents;
-            territory_list[start].residents=0;
-            game_ended(running);
-        }else{
-            territory_list[end].residents=territory_list[start].residents-territory_list[end].residents;
-            territory_list[end].player_id=territory_list[start].player_id;
-            territory_list[start].residents=0;
-            game_ended(running);
+struct territory* move(){
+    for(int i=0;i<N_TERRITORIES;i++){
+        for(int j=0;j<N_TERRITORIES;j++){
+            if(territory_list[i].going_list[j]>2){
+                add_to_moving(&territory_list[i],&territory_list[j],2);
+                territory_list[i].going_list[j]-=2;
+                territory_list[i].going-=2;
+            }else if(territory_list[i].going_list[j]>0){
+                add_to_moving(&territory_list[i],&territory_list[j],territory_list[i].going_list[j]);
+                territory_list[i].going-=territory_list[i].going_list[j];
+                territory_list[i].going_list[j]=0;
+            }
         }
     }
     return territory_list;
