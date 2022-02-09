@@ -2,6 +2,7 @@
     "files.associations": {
         "graphic.h": "c",
         "sdl_image.h": "c",
-        "sdl.h": "c"
+        "sdl.h": "c",
+        "logic.h": "c"
     }
 }

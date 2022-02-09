@@ -113,12 +113,12 @@ int main(int argc, char* argv[]){
         kill();
         return 0;
     }else if(game_res==2){
+        show_win_lose(0);
         kill();
-        printf("You Lost.\n");
         main(0,NULL);
     }else if(game_res==3){
+        show_win_lose(1);
         kill();
-        printf("You Won.\n");
         main(0,NULL);
     }
 

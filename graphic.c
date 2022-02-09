@@ -1,6 +1,76 @@
 #include "graphic.h"
 #include "logic.h"
 
+void show_text(char* text,int x,int y,SDL_Color text_color){
+    SDL_Rect textbox = {x, y, 20, 20};
+    TTF_SizeText(font, text,&textbox.w, &textbox.h);
+    textsurface = TTF_RenderText_Blended(font,text,text_color);
+    ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
+    SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
+            SDL_DestroyTexture(ttfTexture);
+        SDL_FreeSurface(textsurface);
+}
+
+void show_win_lose(char state){
+    image_texture= initialize_texture_from_file("menu.png", renderer);
+
+    char running = 1;
+    int counter=0;
+    SDL_Event event;
+    while(running){        
+        while(SDL_PollEvent(&event)){
+            if(event.type == SDL_QUIT){
+                running = 0;
+            }else if(event.type == SDL_KEYDOWN){
+                //Handle backspace
+                if(event.key.keysym.sym == SDLK_ESCAPE){
+                    //lop off character
+                    return;
+                }
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        SDL_Color text_color = {0, 0, 0, 255};
+
+        texture_destination.x = 150;
+        texture_destination.y = 25;
+        texture_destination.w = MENU_WIDTH;
+        texture_destination.h = MENU_HEIGHT;
+
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+
+        if(state){
+            show_text("You win.",270,136,text_color);
+            show_text("Score:",275,168,text_color);
+            show_text("100",280,200,text_color);
+        }else{
+            show_text("You lose.",270,136,text_color);
+            show_text("Score:",240,168,text_color);
+            show_text("-50",240,200,text_color);
+        }
+        show_text("Press ESC to continue",240,232,text_color);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(1000 / FPS);
+    }
+}
+
+void delete_moving(struct moving** head){
+    struct moving* current = *head;
+    struct moving* next = NULL;
+ 
+    while (current != NULL)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+ 
+    *head = NULL;
+}
+
 void move_soldiers(){
     struct moving* iterator=head,*last=NULL;
     while(iterator!=NULL){
@@ -87,28 +157,12 @@ void init(){
     font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
 }
 
-void show_text(char* text,int x,int y,SDL_Color text_color){
-    SDL_Rect textbox = {x, y, 20, 20};
-    TTF_SizeText(font, text,&textbox.w, &textbox.h);
-    if(textsurface!=NULL){
-
-    }
-    textsurface = TTF_RenderText_Blended(font,text,text_color);
-    ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
-    SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
-            SDL_DestroyTexture(ttfTexture);
-        SDL_FreeSurface(textsurface);
-}
-
 int menu(){
     int return_val=0;
     image_texture= initialize_texture_from_file("menu.png", renderer);
 
     char username[NAME_LENGTH]={0};
     SDL_StartTextInput();
-
-    SDL_Rect textbox = {175, 50, 72, 14},inputbox = {175, 90, 72, 14},start_button={287,318,27,14},
-                        continue_button={248,243,103,14},scoreboard_button={270,168,59,14};
 
     char running = 1;
     SDL_Event event;
@@ -126,8 +180,16 @@ int menu(){
                 }else if(event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL){
                     strcpy(username , SDL_GetClipboardText());
                 }else if(event.key.keysym.sym == SDLK_RETURN){
-                    return_val=3;
-                    running=0;
+                    //start a new one
+                    if(strlen(username)==0){
+                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+                        "Username Error",
+                        "Please enter username.",
+                        window);
+                    }else{
+                        return_val=3;
+                        running=0;
+                    }
                 }
             }else if(event.type == SDL_TEXTINPUT){
                 //Not copy or pasting
@@ -146,8 +208,15 @@ int menu(){
                         running=0;
                     }else if(event.button.y>300 && event.button.y<350){
                         //start a new one
-                        return_val=3;
-                        running=0;
+                        if(strlen(username)==0){
+                            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+                            "Username Error",
+                            "Please enter username.",
+                            window);
+                        }else{
+                            return_val=3;
+                            running=0;
+                        }
                     }
                 }
             }
@@ -303,6 +372,8 @@ SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer* r
 
 void kill() {
     
+    delete_moving(&head);
+
 	TTF_CloseFont(font);
 	SDL_DestroyTexture(texture);
     SDL_DestroyTexture(image_texture);

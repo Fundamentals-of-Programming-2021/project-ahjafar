@@ -60,6 +60,10 @@ void kill();
 
 int menu();
 
+void show_text(char* text,int x,int y,SDL_Color text_color);
+
+void show_win_lose(char state);
+
 void add_to_moving(struct territory* start,struct territory* end,int n);
 
 void move_soldiers();

@@ -1,6 +1,6 @@
 #ifndef __LOGIC_H__
 #define __LOGIC_H__
-#define N_BOTS 4
+#define N_BOTS 1
 #define N_TERRITORIES 10
 
 #define STARTERS 25
