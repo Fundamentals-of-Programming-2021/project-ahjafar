@@ -21,6 +21,8 @@
 #define IMAGE_SIZE 100
 #define MENU_WIDTH 300
 #define MENU_HEIGHT 350
+#define SCOREBOARD_WIDTH 557
+#define SCOREBOARD_HEIGHT 523
 
 #define SPEED 2.5
 
@@ -58,7 +60,7 @@ SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *r
 
 void kill();
 
-int menu();
+int menu(char username[NAME_LENGTH]);
 
 void show_text(char* text,int x,int y,SDL_Color text_color);
 
@@ -68,5 +70,6 @@ void add_to_moving(struct territory* start,struct territory* end,int n);
 
 void move_soldiers();
 
+void show_scoreboard();
 
 #endif

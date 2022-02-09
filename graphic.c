@@ -7,15 +7,93 @@ void show_text(char* text,int x,int y,SDL_Color text_color){
     textsurface = TTF_RenderText_Blended(font,text,text_color);
     ttfTexture = SDL_CreateTextureFromSurface(renderer, textsurface);
     SDL_RenderCopy(renderer, ttfTexture, NULL, &textbox);
-            SDL_DestroyTexture(ttfTexture);
-        SDL_FreeSurface(textsurface);
+    SDL_DestroyTexture(ttfTexture);
+    SDL_FreeSurface(textsurface);
 }
+
+void push(int scores[5],char users[5][NAME_LENGTH],int score,char user[NAME_LENGTH],int n,int all){
+    for(int i=all;i>=n;i--){
+        strcpy(users[i],users[i-1]);
+        scores[i]=scores[i-1];
+    }
+    strcpy(users[n],user);
+    scores[n]=score;
+}
+
+void show_scoreboard(){
+    FILE* fp=fopen("users.txt","r");
+    int scores[5],score,all=0,added=0;
+    char users[5][NAME_LENGTH];
+    char* user;
+    char line[NAME_LENGTH+50];
+    while(fgets(line, NAME_LENGTH+50, fp)) {
+        user=strtok(line," ");
+        score=atoi(strtok(NULL," "));
+        for(int i=0;i<=all;i++){
+            if(scores[i]<score){
+                push(scores,users,score,user,i,all);
+                all++;
+                added=1;
+                break;
+            }
+        }
+        if(all<4 && added==0){
+            push(scores,users,score,user,0,all);
+            all++;
+            added=1;
+        }
+    }
+    SDL_Texture * image_texture2= initialize_texture_from_file("scoreboard.png", renderer);
+    
+    char running = 1;
+    SDL_Event event;
+    while(running){        
+        while(SDL_PollEvent(&event)){
+            if(event.type == SDL_QUIT){
+                running = 0;
+            }else if(event.type == SDL_KEYDOWN){
+                //Handle backspace
+                if(event.key.keysym.sym == SDLK_ESCAPE){
+                    //lop off character
+                    running = 0;
+                }
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        SDL_Color text_color = {0, 0, 0, 255};
+
+        texture_destination.x = 150;
+        texture_destination.y = 15;
+        texture_destination.w = MENU_WIDTH;
+        texture_destination.h = MENU_HEIGHT;
+
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, image_texture2, NULL, &texture_destination);
+
+        for (int i=0; i<all; i++){
+            show_text(users[i],260,95+57*i,text_color);
+            char* s=malloc(sizeof(char)*10);
+            itoa(scores[i],s,10);
+            show_text(s,380,95+57*i,text_color);
+        }
+
+        show_text("Press ESC to continue",240,370,text_color);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(1000 / FPS);
+    }
+
+    SDL_DestroyTexture(image_texture2);
+}
+    
+    
+
 
 void show_win_lose(char state){
     image_texture= initialize_texture_from_file("menu.png", renderer);
 
     char running = 1;
-    int counter=0;
     SDL_Event event;
     while(running){        
         while(SDL_PollEvent(&event)){
@@ -48,8 +126,8 @@ void show_win_lose(char state){
             show_text("100",280,200,text_color);
         }else{
             show_text("You lose.",270,136,text_color);
-            show_text("Score:",240,168,text_color);
-            show_text("-50",240,200,text_color);
+            show_text("Score:",275,168,text_color);
+            show_text("-50",278,200,text_color);
         }
         show_text("Press ESC to continue",240,232,text_color);
         SDL_RenderPresent(renderer);
@@ -157,11 +235,10 @@ void init(){
     font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
 }
 
-int menu(){
+int menu(char username[NAME_LENGTH]){
     int return_val=0;
     image_texture= initialize_texture_from_file("menu.png", renderer);
 
-    char username[NAME_LENGTH]={0};
     SDL_StartTextInput();
 
     char running = 1;
@@ -200,8 +277,7 @@ int menu(){
                 if(event.button.x>250 && event.button.x<350 && event.button.button==SDL_BUTTON_LEFT){
                     if(event.button.y>150 && event.button.y<200){
                         //scorboard
-                        return_val=1;
-                        running=0;
+                        show_scoreboard();
                     }else if(event.button.y>225 && event.button.y<275){
                         //play saved game
                         return_val=2;

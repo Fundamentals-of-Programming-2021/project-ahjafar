@@ -1,8 +1,31 @@
 #include "graphic.h"
 #include "logic.h"
 
-struct territory* AI(){
-
+void add_user_score(char username[NAME_LENGTH],int add){
+    FILE* fp=fopen("users.txt","r+");
+    char line[NAME_LENGTH+50];
+    char user[100][NAME_LENGTH];
+    int score[100];
+    int i=0;
+    int new=1;
+    while(fgets(line, 100, fp)) {
+        strcpy(user[i],strtok(line," "));
+        score[i]=atoi(strtok(NULL," "));
+        if(strcmp(user[i],username)==0){
+            score[i]+=add;
+            new=0;
+        }
+        i++;
+    }
+    fseek(fp, 0,SEEK_SET);
+    for(int j=0;j<i;j++){
+        fprintf(fp,"%s %d\n",user[j],score[j]);
+    }
+    if(new){
+        fprintf(fp,"%s %d\n",username,add);
+    }
+    fflush(fp);
+    fclose(fp);
 }
 
 void game_ended(char* game_state){
@@ -102,10 +125,11 @@ struct territory* move(){
 }
 
 int main(int argc, char* argv[]){
-    player_setup("AmirHasan",N_BOTS);
+    char username[NAME_LENGTH]={0};
     init();
-    int menu_res=menu(),game_res=0;
+    int menu_res=menu(username),game_res=0;
     if(menu_res==3){
+        player_setup(username,N_BOTS);
         random_map(N_TERRITORIES);
         game_res=draw_map(territory_list);
     }
@@ -114,10 +138,12 @@ int main(int argc, char* argv[]){
         return 0;
     }else if(game_res==2){
         show_win_lose(0);
+        add_user_score(username,-50);
         kill();
         main(0,NULL);
     }else if(game_res==3){
         show_win_lose(1);
+        add_user_score(username,100);
         kill();
         main(0,NULL);
     }
