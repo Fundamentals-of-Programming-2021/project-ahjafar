@@ -60,4 +60,6 @@ int find_clicked(int x,int y);
 
 struct territory* move();
 
+struct territory* AI();
+
 #endif

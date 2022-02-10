@@ -1,6 +1,20 @@
 #include "graphic.h"
 #include "logic.h"
 
+struct territory* AI(){
+    if(rand()%100!=0)return territory_list;
+    int t1,t2=rand()%N_TERRITORIES,t3=rand()%N_TERRITORIES;
+    while(territory_list[(t1=rand()%N_TERRITORIES)].player_id<2 || territory_list[t1].residents<20);
+    if(territory_list[t2].residents+territory_list[t2].going>=territory_list[t3].residents+territory_list[t3].going){
+        territory_list[t1].going_list[t2]=territory_list[t1].residents;
+    }else{
+        territory_list[t1].going_list[t3]=territory_list[t1].residents;
+    }
+    territory_list[t1].going+=territory_list[t1].residents;
+    territory_list[t1].residents=0;
+    return territory_list;
+}
+
 void add_user_score(char username[NAME_LENGTH],int add){
     FILE* fp=fopen("users.txt","r+");
     char line[NAME_LENGTH+50];

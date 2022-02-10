@@ -191,7 +191,7 @@ void show_win_lose(char state){
 void delete_moving(struct moving** head){
     struct moving* current = *head;
     struct moving* next = NULL;
- 
+
     while (current != NULL)
     {
         next = current->next;
@@ -217,9 +217,22 @@ void move_soldiers(){
                 }else if(iterator->end->residents+iterator->end->going>iterator->all){
                     iterator->all-=iterator->end->residents;
                     iterator->end->going-=iterator->all;
+                    for(int i=0;iterator->all!=0;i++){
+                        if(iterator->end->going_list[i]>iterator->all){
+                            iterator->end->going_list[i]-=iterator->all;
+                            iterator->all=0;
+                        }else{
+                            iterator->all-=iterator->end->going_list[i];
+                            iterator->end->going_list[i];
+                        }
+                    }
                 }else{
                     iterator->end->player_id=iterator->player_id;
                     iterator->end->residents=iterator->all-(iterator->end->residents+iterator->end->going);
+                    iterator->end->going=0;
+                    for(int i=0;i<N_TERRITORIES;i++){
+                        iterator->end->going_list[i]=0;
+                    }
                 }
             }
             if(iterator!=head){
@@ -413,7 +426,7 @@ void draw_territory(struct territory state){
     texture_destination.h = IMAGE_SIZE;
 
     char residents[5];
-    itoa(state.going+state.residents,residents,10);
+    itoa(state.going+state.residents+0.5,residents,10);
     int offset;
     switch(strlen(residents)){
         case 1:
@@ -515,6 +528,8 @@ int draw_map(struct territory territory_list[10]){
         move_soldiers();
 
         game_ended(&game_state);
+
+        territory_list=AI();
 
         // Show what was drawn
         SDL_RenderPresent(renderer);
