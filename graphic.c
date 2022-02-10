@@ -529,7 +529,7 @@ int draw_map(struct territory territory_list[10]){
 
         game_ended(&game_state);
 
-        territory_list=AI();
+        territory_list=AI_V2();
 
         // Show what was drawn
         SDL_RenderPresent(renderer);

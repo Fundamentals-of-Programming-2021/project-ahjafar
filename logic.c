@@ -1,17 +1,21 @@
 #include "graphic.h"
 #include "logic.h"
 
-struct territory* AI(){
-    if(rand()%100!=0)return territory_list;
-    int t1,t2=rand()%N_TERRITORIES,t3=rand()%N_TERRITORIES;
-    while(territory_list[(t1=rand()%N_TERRITORIES)].player_id<2 || territory_list[t1].residents<20);
-    if(territory_list[t2].residents+territory_list[t2].going>=territory_list[t3].residents+territory_list[t3].going){
-        territory_list[t1].going_list[t2]=territory_list[t1].residents;
-    }else{
-        territory_list[t1].going_list[t3]=territory_list[t1].residents;
+
+struct territory* AI_V2(){
+    //if(rand()%100!=0)return territory_list;
+    for(int i=0;i<N_TERRITORIES;i++){
+        if(territory_list[i].player_id<2 || territory_list[i].residents<20)continue;
+        for(int j=0;j<N_TERRITORIES;j++){
+            int residents=territory_list[j].residents+1;
+            if(rand()%(50*residents+1000)==0){
+                territory_list[i].going_list[j]=territory_list[i].residents;
+                territory_list[i].going+=territory_list[i].residents;
+                territory_list[i].residents=0;
+                break;
+            }
+        }
     }
-    territory_list[t1].going+=territory_list[t1].residents;
-    territory_list[t1].residents=0;
     return territory_list;
 }
 
