@@ -1,6 +1,61 @@
 #include "graphic.h"
 #include "logic.h"
 
+void potion_timer(struct potion* potion_list){
+    for(int i=0;i<5;i++){
+        if(potion_list[i].exists==0)continue;
+        potion_list[i].timer-=0.008;
+        if(potion_list[i].timer<=0){
+            potion_list[i].exists=0;
+            player_list[potion_list[i].player_id-1].potion_type=0;
+        }
+    }
+}
+
+void get_potions(int x,int y,int player_id){
+    for(int i=0;i<5;i++){
+        if(potion_list[i].exists==0)continue;
+        if(abs(potion_list[i].x+10-x)<15 && abs(potion_list[i].y+10-y)<15 && player_list[player_id-1].potion_type==0){
+            potion_list[i].player_id=player_id;
+            potion_list[i].timer=10.00;
+            player_list[player_id-1].potion_type=potion_list[i].type;
+        }
+    }
+}
+
+void draw_potions(struct territory* territory_list,struct potion* potion_list){
+    for(int i=0;i<5;i++){
+        char image_addr[25];
+        if(potion_list[i].exists==1 && potion_list[i].player_id==-1){
+            sprintf(image_addr,"potions\\%d.png",potion_list[i].type);
+            SDL_Texture * image_texture2= initialize_texture_from_file(image_addr, renderer);
+
+            texture_destination.x = potion_list[i].x;
+            texture_destination.y = potion_list[i].y;
+            texture_destination.w = POTION_WIDTH;
+            texture_destination.h = POTION_HEIGHT;
+
+            SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+        }else if (potion_list[i].exists==1){
+            sprintf(image_addr,"potions\\%d.png",potion_list[i].type);
+            SDL_Texture * image_texture2= initialize_texture_from_file(image_addr, renderer);
+            texture_destination.x = 10;
+            texture_destination.y = potion_list[i].player_id*15;
+            texture_destination.w = POTION_WIDTH/2;
+            texture_destination.h = POTION_HEIGHT/2;
+
+            SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+            boxColor(renderer,
+                    20,
+                    potion_list[i].player_id*15+5,
+                    20+potion_list[i].timer*5,
+                    potion_list[i].player_id*15+10,
+                    colors[potion_list[i].player_id]);
+        }
+        SDL_DestroyTexture(image_texture);
+    }
+}
+
 void show_text(char* text,int x,int y,SDL_Color text_color){
     SDL_Rect textbox = {x, y, 20, 20};
     TTF_SizeText(font, text,&textbox.w, &textbox.h);
@@ -86,9 +141,6 @@ void show_scoreboard(){
 
     SDL_DestroyTexture(image_texture2);
 }
-    
-    
-
 
 void show_win_lose(char state){
     image_texture= initialize_texture_from_file("menu.png", renderer);
@@ -182,6 +234,7 @@ void move_soldiers(){
                 continue;
             }
         }
+        get_potions(iterator->x+50,iterator->y+50,iterator->player_id);
         last=iterator;
         iterator=iterator->next;
     }
@@ -233,6 +286,10 @@ void init(){
 
     TTF_Init();
     font = TTF_OpenFont("LiberationSerif-Bold.ttf", 12);
+    
+    for(int i=0;i<5;i++){
+        potion_list[i].exists=0;
+    }
 }
 
 int menu(char username[NAME_LENGTH]){
@@ -379,6 +436,25 @@ void draw_territory(struct territory state){
     SDL_DestroyTexture(image_texture);
 }
 
+void add_potion(struct territory* territory_list,struct potion* potion_list){
+    if(rand()%350!=0)return;
+    int r1=rand()%10,r2=rand()%10,w1=rand()%50+10,w2=rand()%50+10;
+    while(r2==r1)r2=rand()%10;
+    int x=(w1*(territory_list[r1].x+50)+w2*(territory_list[r2].x+50))/(w1+w2);
+    int y=(w1*(territory_list[r1].y+50)+w2*(territory_list[r2].y+50))/(w1+w2);
+    int type=rand()%4+1;
+    for(int i=0;i<5;i++){
+        if(potion_list[i].exists==1)continue;
+        potion_list[i].x=x;
+        potion_list[i].y=y;
+        potion_list[i].exists=1;
+        potion_list[i].timer=10.00;
+        potion_list[i].player_id=-1;
+        potion_list[i].type=type;
+        break;
+    }
+}
+
 int draw_map(struct territory territory_list[10]){
     char game_state = 1;
     int start_point=-1;
@@ -416,7 +492,8 @@ int draw_map(struct territory territory_list[10]){
 
         for(int i=0;i<N_TERRITORIES;i++){
             if(territory_list[i].residents<50 && territory_list[i].player_id!=0)
-                territory_list[i].residents+=RATE;
+                if(player_list[territory_list[i].player_id-1].potion_type==1)territory_list[i].residents+=2*RATE;
+                else territory_list[i].residents+=RATE;
         }
 
         for(int i=0;i<N_TERRITORIES;i++){
@@ -427,6 +504,12 @@ int draw_map(struct territory territory_list[10]){
             territory_list=move();
             t=SDL_GetTicks();
         }
+        
+        add_potion(territory_list,potion_list);
+
+        potion_timer(potion_list);
+        
+        draw_potions(territory_list,potion_list);
 
         move_soldiers();
 

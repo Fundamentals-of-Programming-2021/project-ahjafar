@@ -23,6 +23,8 @@
 #define MENU_HEIGHT 350
 #define SCOREBOARD_WIDTH 557
 #define SCOREBOARD_HEIGHT 523
+#define POTION_WIDTH 20
+#define POTION_HEIGHT 27
 
 #define SPEED 2.5
 
@@ -48,6 +50,7 @@ struct moving{
     float v_x,v_y;
     int player_id;
     struct moving* next;
+    int potion_type;
 };
 
 static struct moving* head=NULL;

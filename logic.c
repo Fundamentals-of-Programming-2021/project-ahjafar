@@ -54,12 +54,13 @@ void player_setup(char name[10],char n_bots){
         sprintf(bot_name,"BOT%d",i-1);
         strcpy(player_list[i].name,bot_name);
         player_list[i].score=0;
+        player_list[i].potion_type=0;
     }
 }
 
-void random_map(int n_territories){
+void random_map(int n_territories,time_t seed){
     int x,y;
-    srand(time(0));
+    srand(seed);
     for(int i=0;i<n_territories;i++){
         char found=0;
         while(!found){
@@ -130,7 +131,7 @@ int main(int argc, char* argv[]){
     int menu_res=menu(username),game_res=0;
     if(menu_res==3){
         player_setup(username,N_BOTS);
-        random_map(N_TERRITORIES);
+        random_map(N_TERRITORIES,time(0));
         game_res=draw_map(territory_list);
     }
     if(game_res==0){

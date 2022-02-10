@@ -1,6 +1,6 @@
 #ifndef __LOGIC_H__
 #define __LOGIC_H__
-#define N_BOTS 1
+#define N_BOTS 4
 #define N_TERRITORIES 10
 
 #define STARTERS 25
@@ -17,9 +17,25 @@ struct player{
     char name[NAME_LENGTH];
     char id;
     int score;
+    int potion_type;
 };
 
 static struct player player_list[6];
+
+struct potion{
+    int x;
+    int y;
+    int type;
+    //1:more producing speed
+    //2:no limit
+    //3:more moving speed
+    //4:freeze
+    int player_id;
+    int exists;
+    double timer;
+};
+
+static struct potion potion_list[5];
 
 struct territory{
     char id;
@@ -38,7 +54,7 @@ void game_ended(char* game_state);
 
 void player_setup(char name[10],char n_bots);
 
-void random_map(int n_territories);
+void random_map(int n_territories,time_t seed);
 
 int find_clicked(int x,int y);
 

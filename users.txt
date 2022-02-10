@@ -1,8 +1,10 @@
 ali 200
 asghar 200
 ahmad 300
-amir 0
+amir 150
 mohammad 25
 hossein -20
 hamed 70
-0
+0 0
+
+ 0
