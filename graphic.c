@@ -87,7 +87,7 @@ void show_scoreboard(){
         for(int i=0;i<=all;i++){
             if(scores[i]<score){
                 push(scores,users,score,user,i,all);
-                all++;
+                if(all<4)all++;
                 added=1;
                 break;
             }
@@ -98,6 +98,7 @@ void show_scoreboard(){
             added=1;
         }
     }
+    if(all==4)all++;
     SDL_Texture * image_texture2= initialize_texture_from_file("scoreboard.png", renderer);
     
     char running = 1;
@@ -130,7 +131,7 @@ void show_scoreboard(){
         for (int i=0; i<all; i++){
             show_text(users[i],260,95+57*i,text_color);
             char* s=malloc(sizeof(char)*10);
-            itoa(scores[i],s,10);
+            sprintf(s,"%d",scores[i]);
             show_text(s,380,95+57*i,text_color);
         }
 
