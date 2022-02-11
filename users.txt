@@ -5,8 +5,3 @@ amir 150
 mohammad 25
 hossein -20
 hamed 70
-qq -50
-bfd 100
-amf 100
-ku -50
-uk 100

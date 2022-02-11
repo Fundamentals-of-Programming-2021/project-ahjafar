@@ -66,12 +66,14 @@ void player_setup(char name[10],char n_bots){
     player_list[0].potion_type=0;
     player_list[0].rate=1;
     player_list[0].nolimit=0;
+    player_list[0].speed=1;
     player_list[1].id=1;
     strcpy(player_list[1].name,name);
     player_list[1].score=0;
     player_list[1].potion_type=0;
     player_list[1].rate=1;
     player_list[1].nolimit=0;
+    player_list[1].speed=1;
     char bot_name[25];
     for(int i=2;i<2+n_bots;i++){
         player_list[i].id=i;
@@ -81,6 +83,7 @@ void player_setup(char name[10],char n_bots){
         player_list[i].potion_type=0;
         player_list[i].rate=1;
         player_list[i].nolimit=0;
+        player_list[i].speed=1;
     }
 }
 

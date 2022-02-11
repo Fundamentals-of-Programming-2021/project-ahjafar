@@ -31,6 +31,9 @@ void potion_timer(struct potion* potion_list,struct player player_list[6]){
                 case 2:
                     player_list[potion_list[i].player_id-1].nolimit=0;
                     break;
+                case 3:
+                    player_list[potion_list[i].player_id-1].speed=1;
+                    break;
             }
         }
     }
@@ -49,6 +52,9 @@ void get_potions(int x,int y,int player_id,struct player player_list[6]){
                     break;
                 case 2:
                     player_list[player_id-1].nolimit=1;
+                    break;
+                case 3:
+                    player_list[potion_list[i].player_id-1].speed=2;
                     break;
             }
         }
@@ -288,8 +294,8 @@ void move_soldiers(struct player player_list[6]){
     struct moving* iterator=head,*last=NULL;
     while(iterator!=NULL){
         filledCircleColor(renderer, iterator->x+50, iterator->y+50, 3,  colors[iterator->player_id]);
-        iterator->x+=iterator->v_x;
-        iterator->y+=iterator->v_y;
+        iterator->x+=player_list[iterator->player_id-1].speed*iterator->v_x;
+        iterator->y+=player_list[iterator->player_id-1].speed*iterator->v_y;
         if(abs(iterator->end->x-iterator->x)<10 && abs(iterator->end->y-iterator->y)<10){
             if(iterator->player_id==iterator->end->player_id){
                 iterator->end->residents+=iterator->all;
