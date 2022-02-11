@@ -639,7 +639,7 @@ int draw_map(struct territory territory_list[10],struct player player_list[6],in
 
         game_ended(&game_state);
 
-        //territory_list=AI_V2();
+        territory_list=AI_V2();
 
         int mouse_x,mouse_y;
         SDL_GetMouseState(&mouse_x, &mouse_y);

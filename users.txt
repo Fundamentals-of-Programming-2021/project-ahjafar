@@ -6,3 +6,4 @@ mohammad 25
 hossein -20
 hamed 70
 a -50
+1 -100

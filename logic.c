@@ -3,12 +3,11 @@
 
 
 struct territory* AI_V2(){
-    //if(rand()%100!=0)return territory_list;
     for(int i=0;i<N_TERRITORIES;i++){
         if(territory_list[i].player_id<2 || territory_list[i].residents<20)continue;
         for(int j=0;j<N_TERRITORIES;j++){
-            int residents=territory_list[j].residents+1;
-            if(rand()%(50*residents+1000)==0){
+            int residents=territory_list[j].residents;
+            if(rand()%(50*residents+1000)==0 && i!=j){
                 territory_list[i].going_list[j]=territory_list[i].residents;
                 territory_list[i].going+=territory_list[i].residents;
                 territory_list[i].residents=0;
@@ -100,10 +99,10 @@ void random_map(int n_territories,int seed){
                 if(abs(territory_list[j].x-x)<100 && abs(territory_list[j].y-y)<100){
                     found=0;
                     break;
-                }else if(x<80 && y<100){
-                    found=0;
-                    break;
                 }
+            }
+            if(x<80 && y<100){
+                found=0;
             }
         }
         territory_list[i].x=x;
@@ -177,12 +176,10 @@ int main(int argc, char* argv[]){
         show_win_lose(0);
         add_user_score(username,-50);
         kill();
-        main(0,NULL);
     }else if(game_res==3){
         show_win_lose(1);
         add_user_score(username,100);
         kill();
-        main(0,NULL);
     }
 
 }
