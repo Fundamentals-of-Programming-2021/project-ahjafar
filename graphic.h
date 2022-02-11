@@ -40,6 +40,8 @@ static SDL_Rect texture_destination;
 static SDL_Surface* textsurface=NULL;
 static SDL_Texture* ttfTexture;
 
+static char is_moving=0;
+
 struct moving{
     float x;
     float y;

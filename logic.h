@@ -29,10 +29,10 @@ struct potion{
     int x;
     int y;
     int type;
-    //1:more producing speed
-    //2:no limit
-    //3:more moving speed
-    //4:freeze
+    //1:more producing speed -> cyan
+    //2:no limit -> red
+    //3:more moving speed -> green
+    //4:freeze -> blue
     int player_id;
     int exists;
     double timer;
@@ -57,11 +57,11 @@ void game_ended(char* game_state);
 
 void player_setup(char name[10],char n_bots);
 
-void random_map(int n_territories,time_t seed);
+void random_map(int n_territories,int seed);
 
 int find_clicked(int x,int y);
 
-struct territory* move();
+struct territory* move(char is_moving);
 
 struct territory* AI_V2();
 

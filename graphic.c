@@ -23,17 +23,22 @@ void potion_timer(struct potion* potion_list,struct player player_list[6]){
         potion_list[i].timer-=0.01;
         if(potion_list[i].timer<=0){
             potion_list[i].exists=0;
-            player_list[potion_list[i].player_id-1].potion_type=0;
-            switch(potion_list[i].type){
-                case 1:
-                    player_list[potion_list[i].player_id-1].rate=1;
-                    break;
-                case 2:
-                    player_list[potion_list[i].player_id-1].nolimit=0;
-                    break;
-                case 3:
-                    player_list[potion_list[i].player_id-1].speed=1;
-                    break;
+            if(potion_list[i].player_id!=-1){
+                player_list[potion_list[i].player_id-1].potion_type=0;
+                switch(potion_list[i].type){
+                    case 1:
+                        player_list[potion_list[i].player_id-1].rate=1;
+                        break;
+                    case 2:
+                        player_list[potion_list[i].player_id-1].nolimit=0;
+                        break;
+                    case 3:
+                        player_list[potion_list[i].player_id-1].speed=1;
+                        break;
+                    case 4:
+                        is_moving=0;
+                        break;
+                }
             }
         }
     }
@@ -55,6 +60,10 @@ void get_potions(int x,int y,int player_id,struct player player_list[6]){
                     break;
                 case 3:
                     player_list[potion_list[i].player_id-1].speed=2;
+                    break;
+                case 4:
+                    is_moving=potion_list[i].player_id;
+                    potion_list[i].timer=2.00;
                     break;
             }
         }
@@ -294,8 +303,16 @@ void move_soldiers(struct player player_list[6]){
     struct moving* iterator=head,*last=NULL;
     while(iterator!=NULL){
         filledCircleColor(renderer, iterator->x+50, iterator->y+50, 3,  colors[iterator->player_id]);
-        iterator->x+=player_list[iterator->player_id-1].speed*iterator->v_x;
-        iterator->y+=player_list[iterator->player_id-1].speed*iterator->v_y;
+        if(is_moving){
+            if(iterator->player_id==is_moving){
+                iterator->x+=player_list[iterator->player_id-1].speed*iterator->v_x;
+                iterator->y+=player_list[iterator->player_id-1].speed*iterator->v_y;
+            }
+        }else{
+            iterator->x+=player_list[iterator->player_id-1].speed*iterator->v_x;
+            iterator->y+=player_list[iterator->player_id-1].speed*iterator->v_y;
+        }
+        
         if(abs(iterator->end->x-iterator->x)<10 && abs(iterator->end->y-iterator->y)<10){
             if(iterator->player_id==iterator->end->player_id){
                 iterator->end->residents+=iterator->all;
@@ -605,7 +622,7 @@ int draw_map(struct territory territory_list[10],struct player player_list[6],in
         }
 
         if(SDL_GetTicks()-t>200){
-            territory_list=move();
+            territory_list=move(is_moving);
             t=SDL_GetTicks();
         }
         

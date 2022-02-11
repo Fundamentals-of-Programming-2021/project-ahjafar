@@ -87,7 +87,7 @@ void player_setup(char name[10],char n_bots){
     }
 }
 
-void random_map(int n_territories,time_t seed){
+void random_map(int n_territories,int seed){
     int x,y;
     srand(seed);
     for(int i=0;i<n_territories;i++){
@@ -140,17 +140,19 @@ int find_clicked(int x,int y){
     return found;
 }
 
-struct territory* move(){
+struct territory* move(char is_moving){
     for(int i=0;i<N_TERRITORIES;i++){
-        for(int j=0;j<N_TERRITORIES;j++){
-            if(territory_list[i].going_list[j]>2){
-                add_to_moving(&territory_list[i],&territory_list[j],2);
-                territory_list[i].going_list[j]-=2;
-                territory_list[i].going-=2;
-            }else if(territory_list[i].going_list[j]>0){
-                add_to_moving(&territory_list[i],&territory_list[j],territory_list[i].going_list[j]);
-                territory_list[i].going-=territory_list[i].going_list[j];
-                territory_list[i].going_list[j]=0;
+        if((is_moving && territory_list[i].player_id==is_moving)||is_moving==0){
+            for(int j=0;j<N_TERRITORIES;j++){
+                if(territory_list[i].going_list[j]>2){
+                    add_to_moving(&territory_list[i],&territory_list[j],2);
+                    territory_list[i].going_list[j]-=2;
+                    territory_list[i].going-=2;
+                }else if(territory_list[i].going_list[j]>0){
+                    add_to_moving(&territory_list[i],&territory_list[j],territory_list[i].going_list[j]);
+                    territory_list[i].going-=territory_list[i].going_list[j];
+                    territory_list[i].going_list[j]=0;
+                }
             }
         }
     }
