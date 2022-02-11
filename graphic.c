@@ -596,7 +596,7 @@ int draw_map(struct territory territory_list[10],struct player player_list[6],in
             }else if(event.type==SDL_MOUSEBUTTONUP){
                 if(event.button.button==SDL_BUTTON_LEFT){
                     end_point=find_clicked(event.button.x,event.button.y);
-                    if(start_point!=-1 && end_point!=-1 && start_point!=end_point){
+                    if(start_point!=-1 && end_point!=-1 && start_point!=end_point && territory_list[start_point-1].player_id==1){
                         territory_list[start_point-1].going_list[end_point-1]=territory_list[start_point-1].residents;
                         territory_list[start_point-1].going+=territory_list[start_point-1].residents;
                         territory_list[start_point-1].residents=0;
