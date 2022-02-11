@@ -1,9 +1,2 @@
 ali 100
-asghar 200
-ahmad 255
-amir 150
-mohammad 25
-hossein -20
-hamed 70
-a -50
-1 -100
+amir 100
