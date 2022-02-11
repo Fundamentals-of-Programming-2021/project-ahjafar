@@ -1,6 +1,22 @@
 #include "graphic.h"
 #include "logic.h"
 
+void savemap(int seed){
+    FILE* fp=fopen("map.dat","wb");
+    char str[20];
+    sprintf(str,"%d",seed);
+    fwrite(str,20,1,fp);
+    fclose(fp);
+}
+
+int loadmap(){
+    FILE* fp=fopen("map.dat","rb");
+    char buf[20];
+    fread(buf,20,1,fp);
+    fclose(fp);
+    return atoi(buf);
+}
+
 void potion_timer(struct potion* potion_list){
     for(int i=0;i<5;i++){
         if(potion_list[i].exists==0)continue;
@@ -75,6 +91,60 @@ void push(int scores[5],char users[5][NAME_LENGTH],int score,char user[NAME_LENG
     scores[n]=score;
 }
 
+int map_setting(){
+    SDL_Texture * image_texture= initialize_texture_from_file("menu.png", renderer);
+    
+    SDL_Event event;
+    while(1){        
+        while(SDL_PollEvent(&event)){
+            if(event.type == SDL_QUIT){
+                return 0;
+            }else if(event.type==SDL_MOUSEBUTTONDOWN){
+                if(event.button.x>235 && event.button.x<365 && event.button.button==SDL_BUTTON_LEFT){
+                    if(event.button.y>40 && event.button.y<90){
+                        return 1;
+                    }else if(event.button.y>105 && event.button.y<155){
+                        return 2;
+                    }else if(event.button.y>170 && event.button.y<220){
+                        return 3;
+                    }else if(event.button.y>235 && event.button.y<285){
+                        return loadmap(); 
+                    }else if(event.button.y>300 && event.button.y<350){
+                        return time(0); 
+                    }
+                }
+            }
+        }
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+        texture_destination.x = 150;
+        texture_destination.y = 15;
+        texture_destination.w = MENU_WIDTH;
+        texture_destination.h = MENU_HEIGHT;
+
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, image_texture, NULL, &texture_destination);
+
+        boxColor(renderer, 235, 40, 365, 90, 0x44ff0000);
+        boxColor(renderer, 235, 105, 365, 155, 0x44ff0000);
+        boxColor(renderer, 235, 170, 365, 220, 0x44ff0000);
+        boxColor(renderer, 235, 235, 365, 285, 0x44ff0000);
+        boxColor(renderer, 235, 300, 365, 350, 0x44ff0000);
+
+        show_text("Map 1",283,58,text_color);
+        show_text("Map 2",283,123,text_color);
+        show_text("Map 3",283,188,text_color);
+        show_text("Load Map",275,253,text_color);
+        show_text("Random map",267, 318,text_color);
+
+        SDL_RenderPresent(renderer);
+        SDL_Delay(1000 / FPS);
+    }
+
+    SDL_DestroyTexture(image_texture);
+}
+
 void show_scoreboard(){
     FILE* fp=fopen("users.txt","r");
     int scores[5],score,all=0,added=0;
@@ -116,8 +186,6 @@ void show_scoreboard(){
             }
         }
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-        SDL_Color text_color = {0, 0, 0, 255};
 
         texture_destination.x = 150;
         texture_destination.y = 15;
@@ -161,8 +229,6 @@ void show_win_lose(char state){
             }
         }
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-        SDL_Color text_color = {0, 0, 0, 255};
 
         texture_destination.x = 150;
         texture_destination.y = 25;
@@ -345,7 +411,7 @@ int menu(char username[NAME_LENGTH]){
                     strcpy(username,strcat(username,event.text.text));
                 }
             }else if(event.type==SDL_MOUSEBUTTONDOWN){
-                if(event.button.x>250 && event.button.x<350 && event.button.button==SDL_BUTTON_LEFT){
+                if(event.button.x>235 && event.button.x<365 && event.button.button==SDL_BUTTON_LEFT){
                     if(event.button.y>150 && event.button.y<200){
                         //scorboard
                         show_scoreboard();
@@ -370,9 +436,6 @@ int menu(char username[NAME_LENGTH]){
         }
         
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-        SDL_Color text_color = {0, 0, 0, 255};
-
 
         texture_destination.x = 150;
         texture_destination.y = 25;
@@ -469,7 +532,7 @@ void add_potion(struct territory* territory_list,struct potion* potion_list){
     }
 }
 
-int draw_map(struct territory territory_list[10]){
+int draw_map(struct territory territory_list[10],int seed){
     char game_state = 1;
     int start_point=-1;
     int end_point=-1;
@@ -485,7 +548,11 @@ int draw_map(struct territory territory_list[10]){
                 game_state = 0;
             }else if(event.type==SDL_MOUSEBUTTONDOWN){
                 if(event.button.button==SDL_BUTTON_LEFT){
-                    start_point=find_clicked(event.button.x,event.button.y);
+                    if(event.button.x>10 && event.button.x<70 && event.button.y>90 && event.button.y<110){
+                        savemap(seed);
+                    }else{
+                        start_point=find_clicked(event.button.x,event.button.y);
+                    }
                 }
             }else if(event.type==SDL_MOUSEBUTTONUP){
                 if(event.button.button==SDL_BUTTON_LEFT){
@@ -523,6 +590,9 @@ int draw_map(struct territory territory_list[10]){
 
         potion_timer(potion_list);
         
+        boxColor(renderer,10,90,70,110,0x77993311);
+        show_text("Save Map",15,91,text_color);
+
         draw_potions(territory_list,potion_list);
 
         move_soldiers();

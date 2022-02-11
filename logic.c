@@ -89,7 +89,7 @@ void random_map(int n_territories,time_t seed){
                 if(abs(territory_list[j].x-x)<100 && abs(territory_list[j].y-y)<100){
                     found=0;
                     break;
-                }else if(x<50 && y<80){
+                }else if(x<80 && y<100){
                     found=0;
                     break;
                 }
@@ -152,10 +152,10 @@ int main(int argc, char* argv[]){
     int menu_res=menu(username),game_res=0;
     if(menu_res==3){
         player_setup(username,N_BOTS);
-        int seed=time(0);
-        printf("%d",seed);
+        int seed=map_setting();
+        if(seed==0)exit(0);
         random_map(N_TERRITORIES,seed);
-        game_res=draw_map(territory_list);
+        game_res=draw_map(territory_list,seed);
     }
     if(game_res==0){
         kill();

@@ -49,14 +49,15 @@ struct moving{
     float v_x,v_y;
     int player_id;
     struct moving* next;
-    int potion_type;
 };
 
 static struct moving* head=NULL;
 
+static SDL_Color text_color = {0, 0, 0, 255};
+
 void init();
 
-int draw_map(struct territory territory_list[10]);
+int draw_map(struct territory territory_list[10],int seed);
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 
@@ -73,5 +74,7 @@ void add_to_moving(struct territory* start,struct territory* end,int n);
 void move_soldiers();
 
 void show_scoreboard();
+
+int map_setting();
 
 #endif
