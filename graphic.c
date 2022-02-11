@@ -15,7 +15,7 @@ void potion_timer(struct potion* potion_list){
 void get_potions(int x,int y,int player_id){
     for(int i=0;i<5;i++){
         if(potion_list[i].exists==0)continue;
-        if(abs(potion_list[i].x+10-x)<15 && abs(potion_list[i].y+10-y)<15 && player_list[player_id-1].potion_type==0){
+        if(abs(potion_list[i].x+10-x)<15 && abs(potion_list[i].y+10-y)<15 && player_list[player_id-1].potion_type==0 && potion_list[i].player_id==-1){
             potion_list[i].player_id=player_id;
             potion_list[i].timer=10.00;
             player_list[player_id-1].potion_type=potion_list[i].type;
@@ -490,12 +490,12 @@ int draw_map(struct territory territory_list[10]){
             }else if(event.type==SDL_MOUSEBUTTONUP){
                 if(event.button.button==SDL_BUTTON_LEFT){
                     end_point=find_clicked(event.button.x,event.button.y);
-                    //printf("moved from %d to %d\n",start_point,end_point);
                     if(start_point!=-1 && end_point!=-1 && start_point!=end_point){
                         territory_list[start_point-1].going_list[end_point-1]=territory_list[start_point-1].residents;
                         territory_list[start_point-1].going+=territory_list[start_point-1].residents;
                         territory_list[start_point-1].residents=0;
                     }
+                    start_point=-1;
                 }
             }
         }
@@ -531,6 +531,13 @@ int draw_map(struct territory territory_list[10]){
 
         territory_list=AI_V2();
 
+        int mouse_x,mouse_y;
+        SDL_GetMouseState(&mouse_x, &mouse_y);
+        if(start_point!=-1){
+            SDL_RenderDrawLine(renderer,
+                               territory_list[start_point-1].x+50,territory_list[start_point-1].y+50,
+                               mouse_x,mouse_y);
+        }
         // Show what was drawn
         SDL_RenderPresent(renderer);
         SDL_Delay(1000 / FPS);
