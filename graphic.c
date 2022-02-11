@@ -17,24 +17,34 @@ int loadmap(){
     return atoi(buf);
 }
 
-void potion_timer(struct potion* potion_list){
+void potion_timer(struct potion* potion_list,struct player player_list[6]){
     for(int i=0;i<5;i++){
         if(potion_list[i].exists==0)continue;
         potion_list[i].timer-=0.008;
         if(potion_list[i].timer<=0){
             potion_list[i].exists=0;
             player_list[potion_list[i].player_id-1].potion_type=0;
+            switch(potion_list[i].type){
+                case 1:
+                    player_list[potion_list[i].player_id-1].rate=1;
+                    break;
+            }
         }
     }
 }
 
-void get_potions(int x,int y,int player_id){
+void get_potions(int x,int y,int player_id,struct player player_list[6]){
     for(int i=0;i<5;i++){
         if(potion_list[i].exists==0)continue;
         if(abs(potion_list[i].x+10-x)<15 && abs(potion_list[i].y+10-y)<15 && player_list[player_id-1].potion_type==0 && potion_list[i].player_id==-1){
             potion_list[i].player_id=player_id;
             potion_list[i].timer=10.00;
             player_list[player_id-1].potion_type=potion_list[i].type;
+            switch(potion_list[i].type){
+                case 1:
+                    player_list[player_id-1].rate=3;
+                    break;
+            }
         }
     }
 }
@@ -268,7 +278,7 @@ void delete_moving(struct moving** head){
     *head = NULL;
 }
 
-void move_soldiers(){
+void move_soldiers(struct player player_list[6]){
     struct moving* iterator=head,*last=NULL;
     while(iterator!=NULL){
         filledCircleColor(renderer, iterator->x+50, iterator->y+50, 3,  colors[iterator->player_id]);
@@ -314,7 +324,7 @@ void move_soldiers(){
                 continue;
             }
         }
-        get_potions(iterator->x+50,iterator->y+50,iterator->player_id);
+        get_potions(iterator->x+50,iterator->y+50,iterator->player_id,player_list);
         last=iterator;
         iterator=iterator->next;
     }
@@ -532,7 +542,7 @@ void add_potion(struct territory* territory_list,struct potion* potion_list){
     }
 }
 
-int draw_map(struct territory territory_list[10],int seed){
+int draw_map(struct territory territory_list[10],struct player player_list[6],int seed){
     char game_state = 1;
     int start_point=-1;
     int end_point=-1;
@@ -573,8 +583,7 @@ int draw_map(struct territory territory_list[10],int seed){
 
         for(int i=0;i<N_TERRITORIES;i++){
             if(territory_list[i].residents<50 && territory_list[i].player_id!=0)
-                if(player_list[territory_list[i].player_id-1].potion_type==1)territory_list[i].residents+=2*RATE;
-                else territory_list[i].residents+=RATE;
+                territory_list[i].residents+=player_list[territory_list[i].player_id-1].rate*RATE;
         }
 
         for(int i=0;i<N_TERRITORIES;i++){
@@ -588,18 +597,18 @@ int draw_map(struct territory territory_list[10],int seed){
         
         add_potion(territory_list,potion_list);
 
-        potion_timer(potion_list);
+        potion_timer(potion_list,player_list);
         
         boxColor(renderer,10,90,70,110,0x77993311);
         show_text("Save Map",15,91,text_color);
 
         draw_potions(territory_list,potion_list);
 
-        move_soldiers();
+        move_soldiers(player_list);
 
         game_ended(&game_state);
 
-        territory_list=AI_V2();
+        //territory_list=AI_V2();
 
         int mouse_x,mouse_y;
         SDL_GetMouseState(&mouse_x, &mouse_y);

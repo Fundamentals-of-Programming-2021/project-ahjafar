@@ -57,7 +57,7 @@ static SDL_Color text_color = {0, 0, 0, 255};
 
 void init();
 
-int draw_map(struct territory territory_list[10],int seed);
+int draw_map(struct territory territory_list[10],struct player player_list[6],int seed);
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 

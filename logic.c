@@ -63,9 +63,13 @@ void player_setup(char name[10],char n_bots){
     player_list[0].id=0;
     strcpy(player_list[0].name,"neutral");
     player_list[0].score=0;
+    player_list[0].potion_type=0;
+    player_list[0].rate=1;
     player_list[1].id=1;
     strcpy(player_list[1].name,name);
     player_list[1].score=0;
+    player_list[1].potion_type=0;
+    player_list[1].rate=1;
     char bot_name[25];
     for(int i=2;i<2+n_bots;i++){
         player_list[i].id=i;
@@ -73,6 +77,7 @@ void player_setup(char name[10],char n_bots){
         strcpy(player_list[i].name,bot_name);
         player_list[i].score=0;
         player_list[i].potion_type=0;
+        player_list[i].rate=1;
     }
 }
 
@@ -155,7 +160,7 @@ int main(int argc, char* argv[]){
         int seed=map_setting();
         if(seed==0)exit(0);
         random_map(N_TERRITORIES,seed);
-        game_res=draw_map(territory_list,seed);
+        game_res=draw_map(territory_list,player_list,seed);
     }
     if(game_res==0){
         kill();

@@ -18,6 +18,7 @@ struct player{
     char id;
     int score;
     int potion_type;
+    int rate;
 };
 
 static struct player player_list[6];
