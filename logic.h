@@ -19,6 +19,7 @@ struct player{
     int score;
     int potion_type;
     int rate;
+    int nolimit;
 };
 
 static struct player player_list[6];

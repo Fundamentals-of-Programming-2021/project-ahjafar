@@ -20,13 +20,16 @@ int loadmap(){
 void potion_timer(struct potion* potion_list,struct player player_list[6]){
     for(int i=0;i<5;i++){
         if(potion_list[i].exists==0)continue;
-        potion_list[i].timer-=0.008;
+        potion_list[i].timer-=0.01;
         if(potion_list[i].timer<=0){
             potion_list[i].exists=0;
             player_list[potion_list[i].player_id-1].potion_type=0;
             switch(potion_list[i].type){
                 case 1:
                     player_list[potion_list[i].player_id-1].rate=1;
+                    break;
+                case 2:
+                    player_list[potion_list[i].player_id-1].nolimit=0;
                     break;
             }
         }
@@ -43,6 +46,9 @@ void get_potions(int x,int y,int player_id,struct player player_list[6]){
             switch(potion_list[i].type){
                 case 1:
                     player_list[player_id-1].rate=3;
+                    break;
+                case 2:
+                    player_list[player_id-1].nolimit=1;
                     break;
             }
         }
@@ -582,7 +588,9 @@ int draw_map(struct territory territory_list[10],struct player player_list[6],in
         SDL_RenderClear(renderer);
 
         for(int i=0;i<N_TERRITORIES;i++){
-            if(territory_list[i].residents<50 && territory_list[i].player_id!=0)
+            if(player_list[territory_list[i].player_id-1].nolimit==1)
+                territory_list[i].residents+=player_list[territory_list[i].player_id-1].rate*RATE;
+            else if(territory_list[i].residents<50 && territory_list[i].player_id!=0)
                 territory_list[i].residents+=player_list[territory_list[i].player_id-1].rate*RATE;
         }
 
